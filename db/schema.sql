@@ -4,7 +4,7 @@ USE track_my_workforce_db;
 
 CREATE TABLE departments (
     id INTEGER PRIMARY KEY AUTO_INCREMENT NOT NULL,
-    department_name VARCHAR(30) 
+    department_name VARCHAR(30) NOT NULL
 );
 
 CREATE TABLE roles (

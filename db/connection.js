@@ -3,8 +3,8 @@ const db = mysql.createConnection(
   {
     host: "localhost",
     user: "root",
-    password: process.env.DB_PW,
-    database: process.env.DB_NAME,
+    password: "Zarakifan13",
+    database: "track_my_workforce_db",
   },
   console.log("\n You are now connected to the Workforce Database.\n")
 );
