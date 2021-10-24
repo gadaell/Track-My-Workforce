@@ -159,6 +159,7 @@ const addEmployee = () => {
         name: "newEmpLastName",
       },
     ])
+    //adding a role to new employee
     .then((answer) => {
       const bothNames = [answer.newEmpFirstName, answer.newEmpLastName];
       const newRole = `SELECT roles.id, roles.title FROM roles`;
@@ -175,8 +176,10 @@ const addEmployee = () => {
             },
           ])
           .then((roleChoice) => {
-            const role = roleChoice.roles;
+            const role = roleChoice.newEmpRle;
             bothNames.push(role);
+
+            //adding manager to new employee
             const newManager = `SELECT * FROM employees`;
             db.query(newManager, (err, data) => {
               if (err) throw err;
