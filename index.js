@@ -1,6 +1,7 @@
 const inquirer = require("inquirer");
 const db = require("./db/connection");
 const { printTable } = require("console-table-printer");
+const { response } = require("express");
 let newRoleDeptArray = [];
 async function startQuestions() {
   // iQ = initial Question(main menu), general setup for startup in the database once sql is initiated
@@ -214,5 +215,64 @@ const addEmployee = () => {
       });
     });
 };
+//update Employee role
+const updateEmployeeRole = () => {
+  db.query(
+    `SELECT employees.id, employees.first_name, employees.last_name, roles.id AS "role_id"
+  FROM employees, roles, departments WHERE departments.id = roles.department_id AND roles.id = employees.role_id`,
+    (err, res) => {
+      if (err) throw err;
+      let employeeNames = [];
+      res.forEach((employees) => {
+        employeeNames.push(`${employees.first_name} ${employees.last_name}`);
+      });
+      let roleMas = `SELECT roles.id, roles.title FROM roles`;
+      db.query(roleMas, (err, res) => {
+        if (err) throw err;
+        let roleArray = [];
+        res.forEach((roles) => {
+          roleArray.push(roles.title);
+        });
+        inquirer
+          .prompt([
+            {
+              name: "updatedEmployee",
+              type: "list",
+              message: "Select the employee whose account you need to update",
+              choices: employeeNames,
+            },
+            {
+              name: "newRole",
+              type: "list",
+              message: "Select the updated employee's new role",
+              choices: roleArray,
+            },
+          ])
+          .then((answer) => {
+            let newTitle, employeeId;
 
+            res.forEach((roles) => {
+              if (answer.newRole === roles.title) {
+                newTitle = roles.id;
+              }
+            });
+            res.forEach((employees) => {
+              if (
+                answer.updatedEmployee ===
+                `${employees.first_name} ${employees.last_name}`
+              ) {
+                employeeId = employees.id;
+              }
+            });
+            let updateSql = `UPDATE employees SET employees.role_id = ? WHERE employees.id = ?`;
+            db.query(updateSql, [newTitle, employeeId], (err) => {
+              if (err) throw err;
+              console.log("Success, the employee's role has been updated");
+              startQuestions();
+            });
+          });
+      });
+    }
+  );
+};
 startQuestions();
