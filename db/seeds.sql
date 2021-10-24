@@ -1,3 +1,4 @@
+
 INSERT INTO departments (department_name)
 VALUES
     ("Sales"),
@@ -26,3 +27,19 @@ VALUES
     ("Sarah", "Kelly", 7, NULL),
     ("Tom", "Allen", 8, 6),
     ("Mark", "Henry", 3, NULL);
+
+SELECT roles.id, roles.title, roles.salary FROM roles ORDER BY roles.id;
+SELECT * FROM employees;
+
+SELECT roles.title, employees.id, employees.first_name, employees.last_name, departments.department_name AS departments
+    FROM employees
+    LEFT JOIN roles ON (roles.id = employees.role_id)
+    LEFT JOIN departments ON (department.id = roles.department_id)
+    ORDER BY roles.title;
+
+SELECT CONCAT( manager.first_name, '', manager.last_name) AS manager, department.department_name AS departments, employees.id, employees.first_name, employees.last_name, roles.title
+    FROM employees
+    LEFT JOIN employees manager ON (manager.id = employees.manager_id)
+    INNER JOIN roles ON (roles.id = employees.role_id && employees.manager_id !="NULL")
+    INNER JOIN departments ON (departments.id = roles.department_id)
+    ORDER BY roles.title

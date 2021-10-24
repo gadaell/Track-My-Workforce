@@ -2,14 +2,6 @@ const inquirer = require("inquirer");
 const db = require("./db/connection");
 const { printTable } = require("console-table-printer");
 let newRoleDeptArray = [];
-//new employee
-let newEmpRoleArray = [];
-let specEmpRoleArray = (newEmpRoleArray) =>
-  newEmpRoleArray.filter((v, i) => newEmpRoleArray.indexOf(v) === i);
-//new manager
-let newEmpManagerArray = [];
-let specEmpManagerArray = (newEmpManagerArray) =>
-  newEmpManagerArray.filter((v, i) => newEmpManagerArray.indexOf(v) === i);
 async function startQuestions() {
   // iQ = initial Question(main menu), general setup for startup in the database once sql is initiated
   let response = await inquirer.prompt([
@@ -154,68 +146,70 @@ const addRole = () => {
 };
 // add an employee
 const addEmployee = () => {
-  const addEmpPrompts = [
-    {
-      type: "input",
-      message: "Enter new employee's first name",
-      name: "newEmpFirstName",
-    },
-    {
-      type: "input",
-      message: "Enter new employee's last name",
-      name: "newEmpLastName",
-    },
-    {
-      type: "list",
-      message: "Choose this employee's role",
-      name: "newEmpRole",
-      choices: specEmpRoleArray(newEmpRoleArray),
-    },
-    {
-      type: "list",
-      message: "Choose this employee's manager",
-      name: "newEmpManager",
-      choices: specEmpManagerArray(newEmpManagerArray),
-    },
-  ];
-  inquirer.prompt(addEmpPrompts).then((addEmpResponse) => {
-    let newEmpFstName = addEmpResponse.newEmpFirstName;
-    let newEmpLstName = addEmpResponse.newEmpLastName;
-    let newEmpRle = addEmpResponse.newEmpRole;
-    let newEmpMan = addEmpResponse.newEmpManager;
-    if (newEmpMan !== "None") {
-      db.query(
-        `SELECT id FROM employees WHERE CONCAT(first_name, " ", last_name) = "${newEmpMan}";`,
-        function (err, results) {
-          let newEmpMgrId = results[0].id;
-
-          db.query(
-            `SELECT id FROM roles WHERE ('${newEmpRle}') = roles.title;`,
-            function (err, results) {
-              let newEmpRleId = results[0].id;
-              //INSERTING the new Employee into the Employees Table.
-              db.query(
-                `INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES('${newEmpFstName}','${newEmpLstName}','${newEmpRleId}','${newEmpMgrId}')`
-              );
-            }
-          );
-        }
-      );
-    } else {
-      db.query(
-        `SELECT id FROM roles WHERE ('${newEmpRle}') = roles.title;`,
-        function (err, results) {
-          let newEmpRleId = results[0].id;
-          //INSERTING the new Employee into the Employees Table.
-          db.query(
-            `INSERT INTO employees (first_name, last_name, role_id) VALUES('${newEmpFstName}','${newEmpLstName}}','${newEmpRleId}')`
-          );
-        }
-      );
-    }
-
-    startQuestions();
-  });
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        message: "Enter new employee's first name",
+        name: "newEmpFirstName",
+      },
+      {
+        type: "input",
+        message: "Enter new employee's last name",
+        name: "newEmpLastName",
+      },
+    ])
+    .then((answer) => {
+      const bothNames = [answer.newEmpFirstName, answer.newEmpLastName];
+      const newRole = `SELECT roles.id, roles.title FROM roles`;
+      db.query(newRole, (err, data) => {
+        if (err) throw err;
+        const roles = data.map(({ id, title }) => ({ name: title, value: id }));
+        inquirer
+          .prompt([
+            {
+              type: "list",
+              name: "newEmpRle",
+              message: "Select your new employee's role",
+              choices: roles,
+            },
+          ])
+          .then((roleChoice) => {
+            const role = roleChoice.roles;
+            bothNames.push(role);
+            const newManager = `SELECT * FROM employees`;
+            db.query(newManager, (err, data) => {
+              if (err) throw err;
+              const managers = data.map(({ first_name, last_name, id }) => ({
+                name: first_name + " " + last_name,
+                value: id,
+              }));
+              inquirer
+                .prompt([
+                  {
+                    type: "list",
+                    name: "manager",
+                    message: "Enter the name of the new employee's manager",
+                    choices: managers,
+                  },
+                ])
+                .then((managerChoice) => {
+                  const manager = managerChoice.manager;
+                  bothNames.push(manager);
+                  const newEmployee = `INSERT INTO employees (first_name, last_name, role_id, manager_id)
+                      VALUES (?, ?, ?, ?) `;
+                  db.query(newEmployee, bothNames, (err) => {
+                    if (err) throw err;
+                    console.log(
+                      "Success, your new employee is now in the database."
+                    );
+                    startQuestions();
+                  });
+                });
+            });
+          });
+      });
+    });
 };
 
 startQuestions();
