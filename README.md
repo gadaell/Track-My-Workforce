@@ -1,6 +1,6 @@
 # Track-My-Workforce
 
-<!-- ![Screenshot](./public/assets/css/images/screenshot-note-taker.PNG) -->
+![Screenshot](assets\track-my-workforce.PNG)
 
 ## User Story
 
@@ -42,7 +42,7 @@ A command line application that to track and manage departments, roles, and empl
 
 ## Challenges
 
-- Lorem
+- The hardest challenge was creating the role function. Trying to get everything to be in sync when you are adding a role was difficult to do, but I learned a lot by solving the problem.
 
 ## Website
 

@@ -2,6 +2,7 @@ const inquirer = require("inquirer");
 const db = require("./db/connection");
 const { printTable } = require("console-table-printer");
 const { response } = require("express");
+const { end } = require("./db/connection");
 let newRoleDeptArray = [];
 async function startQuestions() {
   // iQ = initial Question(main menu), general setup for startup in the database once sql is initiated
@@ -46,7 +47,7 @@ async function startQuestions() {
       updateEmployeeRole();
       break;
     case "Quit":
-      quit();
+      quitapplication();
       break;
   }
 }
@@ -274,5 +275,10 @@ const updateEmployeeRole = () => {
       });
     }
   );
+};
+
+const quitapplication = () => {
+  console.log("Have a great day");
+  process.exit();
 };
 startQuestions();
