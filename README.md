@@ -50,7 +50,7 @@ A command line application that to track and manage departments, roles, and empl
 
 ## Demonstration Video
 
-- Lorem
+- https://watch.screencastify.com/v/VOyJisTvh7n0t8J7e5h4
 
 ## Contact
 
