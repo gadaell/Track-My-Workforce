@@ -1,6 +1,6 @@
 # Track-My-Workforce
 
-![Screenshot](assets\track-my-workforce.PNG)
+![Screenshot](./assets/track-my-workforce.PNG)
 
 ## User Story
 
